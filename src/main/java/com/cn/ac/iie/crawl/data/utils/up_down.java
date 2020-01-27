@@ -24,7 +24,7 @@ public class up_down extends TimerTask{
 	
 	private static 	ChannelSftp sftp;
 	
-	//判断目录是否存在
+	//鍒ゆ柇鐩綍鏄惁瀛樺湪
 	public static boolean isDirExist(String directory) {
 		boolean isDirExistFlag = false;
 		try {
@@ -38,7 +38,7 @@ public class up_down extends TimerTask{
 		}
 		return isDirExistFlag;
 	}
-	//创建目录
+	//鍒涘缓鐩綍
 	public static boolean createDir(String createpath) {
 		try {
 			if (isDirExist(createpath)) {
@@ -79,15 +79,15 @@ public class up_down extends TimerTask{
 			}
 		}
 	}
-	//上传单个文件
+	//涓婁紶鍗曚釜鏂囦欢
 	public static void uploadFile(String remotePath,String localPath, String FileName) {
 		FileInputStream in = null;
-	    System.out.println(FileName);
 			try {
 				createDir(remotePath);
 				File file = new File(localPath + "/"+FileName);
 				in = new FileInputStream(file);
-				sftp.put(in, FileName);
+				sftp.put(in, FileName+".tmp");//涓婁紶涓姞鍚庣紑
+				sftp.rename(FileName+".tmp",FileName);//涓婁紶缁撴潫鍚庨噸鍛藉悕
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (SftpException e) {
@@ -102,10 +102,10 @@ public class up_down extends TimerTask{
 			}
 		}
 	}
-	//批量上传
+	//鎵归噺涓婁紶
 	public static void bacthUploadFile(String remotePath, String localPath){
 		sftp=SftpUtil.builConnection();
-		jedis=RedisUtil.getJedis();//去重
+		jedis=RedisUtil.getJedis();//鍘婚噸
 		try{
 			File file=new File(localPath);
 			File[] files=file.listFiles();
@@ -130,71 +130,18 @@ public class up_down extends TimerTask{
 		}
 		RedisUtil.returnResource(jedis);
 	}
-	//下载单个文件
-	public static void downloadFile(String remotePath, String localPath, String FileName) {
-	    FileOutputStream fileoutput = null;
-	    System.out.println(FileName);
-		try {
-			File file = new File(localPath + "\\jsonfile\\"+FileName);
-//			String fs=file.getParent();
-//			file=new File(fs);
-//			if(!file.exists()){
-//				file.mkdirs();
-//			}
-		    fileoutput = new FileOutputStream(file);
-			sftp.get(remotePath+FileName, fileoutput);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (SftpException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	//下载批量文件
-	public static void batchDownLoadFile(String remotePath, String localPath) {
-		sftp=SftpUtil.builConnection();
-		jedis=RedisUtil.getJedis();
-		try {
-			Vector v = sftp.ls(remotePath);
-			if (v.size() > 0) {
-				Iterator it = v.iterator();
-				while (it.hasNext()) {
-					LsEntry entry = (LsEntry) it.next();
-					String filename = entry.getFilename();
-					if(filename.contains(".json")){
-						if(!jedis.sismember("download", filename)){
-							jedis.sadd("download",filename);
-							downloadFile(remotePath, localPath, filename);
-						}						
-					}
-
-				}
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}finally {
-			try {
-				disconnect();
-			} catch (JSchException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		RedisUtil.returnResource(jedis);
-	}
 	
 	//@Override
 	public void run() {
 		String localPath = "/root/jyreptile/trump/data";
-		//String localPath = "D:\\eclipse\\project\\trump\\data";
-		String remotePath = "/data/baiduNews/";
+//		String localPath = "D:\\eclipse\\project\\trump\\data";
+		String remotePath = "/data/news/newslookup/";
+//		String remotePath = "/data/news/baidu/";
 		bacthUploadFile(remotePath,localPath);
-		batchDownLoadFile(remotePath, localPath); 
 	}	
 	
 	public static void main(String[] args) {
 		Timer timer=new Timer();
-		timer.schedule(new up_down(), 1*1000,600*1000);  //定时任务
+		timer.schedule(new up_down(), 1*1000,1*3600*1000);  //瀹氭椂浠诲姟
 	}	
 }

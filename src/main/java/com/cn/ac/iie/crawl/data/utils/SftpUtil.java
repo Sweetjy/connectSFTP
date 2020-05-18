@@ -10,27 +10,27 @@ import com.jcraft.jsch.Session;
 
 public class SftpUtil {
 	
-    /** SFTP µÇÂ¼ÓÃ»§Ãû*/ 
-    private final static String USERNAME = "xgs";
+    /** SFTP ç™»å½•ç”¨æˆ·å*/ 
+    private final static String USERNAME =;
     
-    /** SFTP µÇÂ¼ÃÜÂë*/   
-	private final static String PASSWORD = "rzx@123";
+    /** SFTP ç™»å½•å¯†ç */   
+	private final static String PASSWORD = ;
 	
-    /** Ë½Ô¿ */    
+    /** ç§é’¥ */    
     private final static String PRIVATE_KEY = null; 
     
-    /** SFTP ·şÎñÆ÷µØÖ·IPµØÖ·*/ 
-	private final static String HOST = "159.138.48.92";
+    /** SFTP æœåŠ¡å™¨åœ°å€IPåœ°å€*/ 
+	private final static String HOST =;
 	
-    /** SFTP ¶Ë¿Ú*/  
-	private final static Integer PORT = 22;
+    /** SFTP ç«¯å£*/  
+	private final static Integer PORT =;
 
 	public static ChannelSftp builConnection() {
 		ChannelSftp sftp = null;
         try {  
             JSch jsch = new JSch();  
             if (PRIVATE_KEY != null) {  
-                jsch.addIdentity(PRIVATE_KEY);// ÉèÖÃË½Ô¿  
+                jsch.addIdentity(PRIVATE_KEY);// è®¾ç½®ç§é’¥  
             }  
     
             Session session = jsch.getSession(USERNAME, HOST, PORT);  
